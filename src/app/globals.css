@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+:root {
+  --tk-com: #0db4b9;
+  --tk-org: #446e88;
+  --tk-fg-1: #1f2731;
+  --tk-fg-2: #475561;
+  --tk-fg-3: #6b7280;
+  --tk-bg-1: #f3f5f7;
+  --tk-bg-2: #ffffff;
+  --tk-bg-3: #e9edf1;
+  --tk-border: #d4dce3;
+  --tk-danger: #d96b5c;
+  --tk-warning: #e0a755;
+  --background: var(--tk-bg-1);
+  --foreground: var(--tk-fg-1);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
