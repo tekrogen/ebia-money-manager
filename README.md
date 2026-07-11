@@ -23,11 +23,12 @@ Open [http://localhost:3000](http://localhost:3000) and continue as Marti.
 ## Stack defaults
 
 - Next.js 16 + React 19 + Tailwind 4
-- Prisma 6 + SQLite (`prisma/dev.db`) for local MVP
+- Prisma 6 + SQLite (`admin/internal/data/dev.db`) for local MVP
 - Cookie session stub (not production auth)
 - Tekrogen-inspired tokens (Poppins / Manrope / teal accent)
 
 ## Docs
 
 Architecture: `admin/internal/features/architecture/README.md`  
-Phase plan: `admin/internal/workflows/2607110948-PHASE-01.md`
+Phase plan: `admin/internal/workflows/2607110948-PHASE-01.md`  
+Agent memory: `CLAUDE.md`

@@ -38,6 +38,9 @@ yarn-error.log*
 .env*
 !.env.example
 
+# local agent notes
+CLAUDE.local.md
+
 # prisma / local sqlite
 /prisma/dev.db
 /prisma/dev.db-journal
