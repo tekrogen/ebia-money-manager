@@ -1,0 +1,16 @@
+name: release-please
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      # Config is read from release-please-config.json + .release-please-manifest.json
+      - uses: googleapis/release-please-action@v4
