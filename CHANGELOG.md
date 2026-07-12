@@ -25,5 +25,10 @@ All notable work on Credit Card Manager is tracked here.
 - Manual-first data model; aggregator sync deferred.
 
 ### Not yet (remaining Phase 01)
-- Slice #3: payment runway + payment intent flow.
+- Slice #3: payment runway + payment intent flow (blocked on Exploration until harness gate closes).
 - Statements, global search, reminder jobs.
+
+### Testing
+- Vitest + Playwright harness under `tests/` (architecture layout).
+- Slices 1–2 covered: unit (money, card schema, promo-math), integration (create-card + household), e2e (sign-in → overview/cards/paydown).
+- CI (`.github/workflows/ci.yml`), release-please, husky/commitlint, issue templates, `BRANCH-WORKFLOWS.md` (trunk-based).

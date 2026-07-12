@@ -11,7 +11,7 @@ Personal **Credit Card Manager** — household credit-card ops (limits, utilizat
 | Doc | Role |
 | --- | --- |
 | `admin/internal/features/architecture/README.md` | App Router structure, domain model, MVP vs later |
-| `admin/internal/workflows/2607110948-PHASE-01.md` | Phase 01 checklist |
+| `admin/internal/workflows/PHASE-01.md` | Phase 01 discovery + checklist |
 | `CHANGELOG.md` | What shipped |
 
 UIUX reference: `admin/internal/features/credit-card-manager-mockup/` (zip/extracted gitignored; do not commit binaries).
@@ -58,6 +58,8 @@ Next: slice #3 — `/payments/runway` + `/payments/new` intent flow; then statem
 pnpm install
 pnpm db:push
 pnpm db:seed
+pnpm test
+pnpm test:e2e
 pnpm dev
 pnpm lint
 ```

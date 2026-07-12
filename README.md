@@ -30,5 +30,6 @@ Open [http://localhost:3000](http://localhost:3000) and continue as Marti.
 ## Docs
 
 Architecture: `admin/internal/features/architecture/README.md`  
-Phase plan: `admin/internal/workflows/2607110948-PHASE-01.md`  
+Phase plan: `admin/internal/workflows/PHASE-01.md`  
+Workflows index: `admin/internal/workflows/README.md`  
 Agent memory: `CLAUDE.md`
