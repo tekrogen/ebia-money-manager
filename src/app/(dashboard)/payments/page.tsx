@@ -1,12 +1,14 @@
-export default function PaymentsPage() {
-  return (
-    <div className="space-y-3">
-      <h1 className="font-[family-name:var(--font-display)] text-2xl font-semibold">
-        Payments
-      </h1>
-      <p className="text-sm text-[var(--tk-fg-3)]">
-        Payment intent flow lands in Phase 01 slice #3.
-      </p>
-    </div>
-  );
+import { redirect } from "next/navigation";
+import { requireOnboardedUser } from "@/features/authentication/server/queries";
+import { findDraftIntent } from "@/features/payments/server/intent-repository";
+
+export default async function PaymentsPage() {
+  const user = await requireOnboardedUser();
+  const draft = await findDraftIntent(user.id);
+
+  if (draft) {
+    redirect(`/payments/new?intentId=${draft.id}`);
+  }
+
+  redirect("/payments/runway");
 }

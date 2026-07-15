@@ -165,9 +165,18 @@ async function main() {
     },
   });
 
+  const checkingAccount = await db.financialAccount.create({
+    data: {
+      userId: user.id,
+      name: "Chase Checking ••4821",
+      currency: "USD",
+    },
+  });
+
   console.log("Seeded demo user", user.email);
   console.log("Household", household.id);
   console.log("Shared card", amazon.id);
+  console.log("Checking account", checkingAccount.id);
 }
 
 main()

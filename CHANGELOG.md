@@ -1,34 +1,108 @@
 # Changelog
 
 All notable work on Credit Card Manager is tracked here.
+Format follows [Keep a Changelog](https://keepachangelog.com/); versions use [Semantic Versioning](https://semver.org/).
 
-## [Unreleased] — Phase 01 (2026-07-11)
+## [0.2.0] — 2026-07-15
 
-### Architecture
-- Authored App Router architecture guide (`admin/internal/features/architecture/README.md`) covering feature folders, money rules, hybrid sync, statements, household, paydown, payment runway, search, and phased MVP.
-- Captured UIUX mockup package under `admin/internal/features/credit-card-manager-mockup/`.
-- Defined Phase 01 workflow (`admin/internal/workflows/2607110948-PHASE-01.md`).
+### Phase 01 Slice #3 — Payment Runway + Payment Intent Flow
 
-### Added
-- Scaffolded Next.js 16 App Router app (`src/`) with Tailwind 4, Poppins/Manrope, Tekrogen-inspired tokens.
-- Prisma 6 schema + SQLite datasource for household, cards, promo periods, statements, payments/intents, preferences, notifications, audit events.
+Feature workflow phases completed: Discovery → Validation Gate → Exploration → Questions/Defaults → Architecture → Implementation.
+
+#### Phase 1: Discovery (2026-07-12)
+
+- Confirmed slice #3 scope: `/payments/runway` planning calendar + `/payments/new` manual intent stepper.
+- Identified prerequisite: test harness for slices 1–2 must be green before Exploration.
+
+#### Validation Gate (2026-07-12)
+
+- Installed Vitest + Playwright; configured `vitest.config.ts`, `playwright.config.ts`.
+- Wrote unit tests for money/utilization, card schema, promo-math (15 pass).
+- Wrote integration tests for create-card + household attribution (4 pass).
+- Wrote E2E tests for slices 1–2: sign-in → overview → cards → paydown (3 pass).
+- Ported CI, release-please, husky/commitlint, issue templates from `ebia`.
+- Branch `chore/1-validation-gate` merged to `main`.
+
+#### Phase 2: Exploration (2026-07-13)
+
+- Mapped existing patterns (feature `index.ts` public API, server action + Zod, thin pages, service→Prisma).
+- Identified 6 gaps requiring decisions: RunwayItem persistence, Intent→Account relation, due-date derivation, FinancialAccount seed, strategy sort, promo-math/ownerLabel exports.
+- Catalogued reusable helpers and key files for slice #3.
+
+#### Phase 3: Questions/Defaults (2026-07-13)
+
+- Locked 8 decisions: new `RunwayItem` model, seed demo `FinancialAccount`, full route-driven stepper, derive dates from `paymentDueDay`, export promo-math + ownerLabel, thin `/payments` page, local `useReducer`, GitHub remote confirmed.
+- Added `PaymentIntent → FinancialAccount` relation to scope.
+
+#### Phase 4: Architecture (2026-07-15)
+
+- Evaluated 3 options (Minimal Changes, Clean Architecture, Pragmatic Balance).
+- Locked **Option 2: feature architecture with layered boundaries** — explicit types → schemas → utils → repository/service → actions → components layers for `payments` domain only.
+
+#### Phase 5: Implementation (2026-07-15)
+
+##### Schema
+- `RunwayItem` model with `RunwayItemSource` enum (`minimum`, `promo_plan`, `custom`).
+- `PaymentIntent → FinancialAccount` relation.
+
+##### Seed
+- `FinancialAccount` ("Chase Checking ••4821") for Marti's household.
+
+##### Shared extractions
+- `promo-math` utilities re-exported from `paydown` feature public API.
+- `getOwnerLabel` extracted to `src/features/household/utils/owner-label.ts`.
+
+##### Feature: `src/features/payments/`
+
+| Layer | Files |
+|-------|-------|
+| Types/DTOs | `types.ts` — `RunwayStrategy`, `RunwayItemDTO`, `PaymentIntentDTO`, `FinancialAccountDTO`, `PaymentCardOption`, `RunwayDashboardDTO`, `InterestPreview` |
+| Schemas | `schemas.ts` — Zod for `selectCard`, `selectAmount`, `selectAccount`, `confirmIntent`, `rescheduleRunwayItem` |
+| Utils | `utils/runway-helpers.ts` — `sortRunwayItems`, `deriveDueDate`, `computeAmountMinor` |
+| Repository | `server/intent-repository.ts` — PaymentIntent full CRUD lifecycle |
+| Service | `server/runway-service.ts` — dashboard query + `generateRunwayFromCards` |
+| Queries | `server/payment-queries.ts` — card options + financial accounts |
+| Actions | `server/actions.ts` — 6 server actions (start, select card/amount/account, confirm, reschedule, regenerate) |
+| State | `server/action-state.ts` — shared `IntentActionState` type |
+| Components | `RunwayTable`, `SelectCardStep`, `SelectAmountStep`, `SelectAccountStep`, `ConfirmStep`, `GenerateRunwayButton` |
+
+##### Routes
+- `/payments/runway` — runway dashboard with generate + "Make a payment" CTA.
+- `/payments/new?intentId=` — multi-step stepper (Card → Amount → Account → Confirm).
+- `/payments` — redirects to active draft or runway.
+
+### Changed
+- `tsconfig.json` target bumped `ES2017 → ES2022` (fixes pre-existing BigInt literal errors across codebase).
+
+### Testing (Phase 5 validation)
+- **Unit/Integration:** 34 tests, 6 files — all passing.
+  - New: `tests/unit/payments/runway-helpers.test.ts` (sort strategies, due dates, amount computation).
+  - New: `tests/integration/payments/intent-lifecycle.test.ts` (draft → submitted lifecycle, runway CRUD).
+- **E2E:** 7 tests (4 new + 3 existing) — all passing.
+  - New: `tests/e2e/payments-runway.spec.ts` (page load, generate items, start intent flow, card selection step).
+- **Validation:** lint clean, production build green, all routes compiled.
+
+---
+
+## [0.1.0] — 2026-07-11
+
+### Phase 01 Slices #1–2: Scaffold, Auth, Overview, Cards, Paydown
+
+#### Architecture
+- App Router architecture guide (`admin/internal/features/architecture/README.md`): feature folders, money rules, hybrid sync, statements, household, paydown, payment runway, search, phased MVP.
+- UIUX mockup package captured under `admin/internal/features/credit-card-manager-mockup/`.
+- Phase 01 workflow initiated (`admin/internal/workflows/PHASE-01.md`).
+
+#### Added
+- Next.js 16 App Router app (`src/`) with Tailwind 4, Poppins/Manrope, Tekrogen-inspired tokens.
+- Prisma 6 schema + SQLite: household, cards, promo periods, statements, payments/intents, preferences, notifications, audit events.
 - Auth stub: cookie session + demo sign-in (`Continue as Marti`).
 - Onboarding manual add-card flow; dashboard cards table with owner/shared labels and utilization badges.
 - Overview portfolio metric grid (balance, available credit, utilization, min payments).
 - Paydown feature: high-utilization priority ranking + 0% promo payoff plan with interest impact callouts.
 - Household settings page listing members.
-- Placeholder routes for payments and payment runway (slice #3).
 - Local DB path `admin/internal/data/dev.db` with seed data (demo household, members, cards, promos).
 
-### Stack defaults
+#### Stack defaults
 - pnpm, Next.js 16, React 19, Prisma 6, Zod 4, SQLite for local MVP.
 - Manual-first data model; aggregator sync deferred.
-
-### Not yet (remaining Phase 01)
-- Slice #3: payment runway + payment intent flow (blocked on Exploration until harness gate closes).
-- Statements, global search, reminder jobs.
-
-### Testing
-- Vitest + Playwright harness under `tests/` (architecture layout).
-- Slices 1–2 covered: unit (money, card schema, promo-math), integration (create-card + household), e2e (sign-in → overview/cards/paydown).
-- CI (`.github/workflows/ci.yml`), release-please, husky/commitlint, issue templates, `BRANCH-WORKFLOWS.md` (trunk-based).

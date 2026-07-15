@@ -71,6 +71,12 @@ enum PaymentIntentStatus {
   expired
 }
 
+enum RunwayItemSource {
+  minimum
+  promo_plan
+  custom
+}
+
 enum AmountType {
   minimum
   statement
@@ -167,6 +173,7 @@ model CreditCard {
   statements             Statement[]
   payments               Payment[]
   paymentIntents         PaymentIntent[]
+  runwayItems            RunwayItem[]
 
   @@index([householdId])
   @@index([ownerMemberId])
@@ -208,13 +215,14 @@ model Statement {
 }
 
 model FinancialAccount {
-  id        String    @id @default(cuid())
-  userId    String
-  name      String
-  currency  String    @default("USD")
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  payments  Payment[]
+  id             String          @id @default(cuid())
+  userId         String
+  name           String
+  currency       String          @default("USD")
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  payments       Payment[]
+  paymentIntents PaymentIntent[]
 }
 
 model PaymentIntent {
@@ -232,8 +240,26 @@ model PaymentIntent {
   updatedAt        DateTime            @updatedAt
   user             User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   card             CreditCard?         @relation(fields: [cardId], references: [id], onDelete: SetNull)
+  account          FinancialAccount?   @relation(fields: [accountId], references: [id], onDelete: SetNull)
 
   @@index([userId, status])
+}
+
+model RunwayItem {
+  id                  String          @id @default(cuid())
+  householdId         String
+  cardId              String
+  plannedPayDate      String
+  contractualDueDate  String?
+  amountMinor         BigInt
+  currency            String          @default("USD")
+  source              RunwayItemSource @default(minimum)
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+  card                CreditCard      @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@index([householdId])
+  @@index([cardId])
 }
 
 model Payment {

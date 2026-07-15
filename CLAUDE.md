@@ -6,6 +6,20 @@ Guidance for agents working in this repository.
 
 Personal **Credit Card Manager** — household credit-card ops (limits, utilization, 0% promos, paydown, payment runway). Not a general net-worth / brokerage app; landing mockup marketing copy is aspirational and out of MVP scope.
 
+## Rules
+
+These must be followed with no exceptions:
+
+1. Do not ever include an AI or Bot generated `Co-Authored` code such as: `Co-Authored-By: Claude …` or `Co-Authored-By: Cursor …` trailer in commits in this code base.
+2. **Check files first, assume nothing.** When there is any confusion, contradiction, or ambiguity — especially about what this project *is*, what it references, or how it relates to other projects (the DS repo, the two surfaces, vendored vs authored code) — verify against the documents, the data, and the codebase (README, CLAUDE.md, `git remote -v`, `git log`, `grep`) *before* answering or acting. Treat the repository's own files as authoritative over anything stated in chat, including loosely-worded inputs and your own prior statements. Report what the files say, then reason. Never carry an unverified claim from conversation forward as fact.
+3. **Follow the branch-naming convention** (see Governance): `<type>/<issue#>-<slug>`, issue first, PR body `Closes #N`.
+4. **Review and validate every UI/UX artifact before declaring it done.** Any UI/UX you author or change here (a mockup surface, a screen, an `admin/review/` artifact, any HTML/CSS) must be (a) **designed to the expert review method** and (b) **validated against the Tekrogen Brand Design System** — *before* hand-off, not after the user reports a defect. The operating brief lives in **`/Volumes/SERV01-DTMAC/_Code_Library/AI prompts/`** — read it when doing this work:
+- **`Design-System-UIUX-Review-Prompt.md`** — the **expert panel** (Senior Product Designer · Design Systems Architect · Front-End Engineering Lead · Visual/UI Designer): visual hierarchy/legibility, token/scale/spacing discipline. Apply every lens the brief defines; be evidence-based.
+5. **Agents** – the agents live in `/Volumes/SERV01-DTMAC/_Code_Library/AI Agents/` (additional agent definitions in `/Volumes/SERV01-DTMAC/_Code_Library/.claude/agents/`)
+6. **Canonical documentation only.** Every planning document must reference only canonical documentation — one authoritative file per topic (architecture: `admin/internal/features-planning/architecture/README.md`; plan: `admin/internal/planning/PRODUCTION-BLUEPRINT.md`). Superseded versions are archived, not left in place; a document that cites a broken or non-canonical path is a defect.
+
+**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
+
 ## Source of truth
 
 | Doc | Role |
