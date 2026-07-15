@@ -3,6 +3,14 @@
 All notable work on Credit Card Manager is tracked here.
 Format follows [Keep a Changelog](https://keepachangelog.com/); versions use [Semantic Versioning](https://semver.org/).
 
+## [0.3.1](https://github.com/tekrogen/ebia-money-manager/compare/v0.3.0...v0.3.1) (2026-07-15)
+
+
+### Bug Fixes
+
+* **payments:** enforce ownership checks and close Phase 6/7 review ([3606243](https://github.com/tekrogen/ebia-money-manager/commit/36062435a61804c986da3d54bf32aa15f7466a90))
+* **payments:** enforce ownership checks and close Phase 6/7 review ([f85abe8](https://github.com/tekrogen/ebia-money-manager/commit/f85abe8e7b15a2ef11e79653e945feee7db0dba4))
+
 ## [0.3.0](https://github.com/tekrogen/ebia-money-manager/compare/v0.2.0...v0.3.0) (2026-07-15)
 
 
