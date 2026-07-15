@@ -61,6 +61,7 @@ jobs:
 
       - name: Prepare database
         run: |
+          mkdir -p admin/internal/data
           pnpm db:generate
           pnpm db:push
           pnpm db:seed

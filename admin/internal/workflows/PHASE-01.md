@@ -109,10 +109,10 @@ Patterns mirrored from sibling `ebia` (CI/release/husky/commitlint/templates), a
 | Gate: harness + slices 1–2 + tooling | Green; on `main` @ origin | https://github.com/tekrogen/ebia-money-manager |
 | 2. Exploration | Done (2026-07-13) | See § Phase 2 below |
 | 3. Clarifying questions | Done (defaults 2026-07-13) | See § Phase 3 below |
-| 4. Architecture | **Locked: Option 2 (feature architecture)** | See § Phase 4 below |
-| 5. Implementation | Pending | After approach approval |
-| 6. Review | Pending | code-reviewer |
-| 7. Summary | Pending | Document shipped work + update CHANGELOG |
+| 4. Architecture | Locked: Option 2 (feature architecture) | See § Phase 4 below |
+| 5. Implementation | Done (2026-07-15) | Squash-merged to `main` @ `331c72e` |
+| 6. Review | Done (2026-07-15) | 7 issues fixed — see § Phase 6 below |
+| 7. Summary | Done (2026-07-15) | This section |
 
 ---
 
@@ -294,13 +294,75 @@ Follow shared GIT-Workflows policy:
 
 ---
 
+## Phase 6: Quality Review (2026-07-15)
+
+Filed 21 issues via two review passes (payments-specific + full codebase). Fixed the 7 issues directly attributable to slice #3 plus 1 CI blocker:
+
+| # | Fix | File(s) |
+|---|-----|---------|
+| **#2** | `selectCardAction` verifies card belongs to household | `actions.ts` |
+| **#3** | `updateIntent*` verifies userId before update (ownership check) | `intent-repository.ts` |
+| **#4** | `rescheduleRunwayItem` requires + verifies `householdId` | `runway-service.ts`, `actions.ts` |
+| **#5** | `selectAmountSchema` refine: custom requires amount > $0 | `schemas.ts` |
+| **#6** | `RunwayItem.householdId` → `Household` relation added | `schema.prisma` |
+| **#11** | CI: `mkdir -p admin/internal/data` before `db:push` | `ci.yml` |
+| **#19** | Dashboard nav: removed redundant Runway entry | `dashboard-shell.tsx` |
+| **#21** | Seed: explicitly deletes `runwayItem` before `creditCard` | `seed.ts` |
+
+### Validation
+
+- Vitest: 34 passed (6 files)
+- TypeScript: no errors
+- ESLint: no new warnings
+- Prisma generate: clean with new Household relation
+
+### Remaining issues (not in scope for slice #3)
+
+13 issues remain open on GitHub; belong to cards/overview/auth/tooling domains. See `admin/internal/issues/README.md` for triage analysis.
+
+---
+
+## Phase 7: Summary (2026-07-15)
+
+### Slice #3 — complete
+
+**Payment Runway + Payment Intent Flow** is fully shipped through all 7 phases of the feature workflow.
+
+#### What shipped
+
+- `RunwayItem` model with household ownership + card relation
+- `PaymentIntent` lifecycle with `FinancialAccount` relation
+- Feature: `src/features/payments/` — types, schemas, utils, repository, service, queries, actions, components
+- Routes: `/payments/runway`, `/payments/new?intentId=`, `/payments`
+- Ownership enforcement on all write paths (intent mutations + runway reschedule)
+- Schema-level validation preventing $0 custom payments
+- Clean dashboard nav (no duplicate entries)
+- CI reliability fix for missing data directory
+
+#### Test coverage
+
+- 34 unit/integration tests across 6 files
+- 7 E2E tests (4 payment-specific + 3 from slices 1–2)
+- All green
+
+#### What's next (remaining Phase 01)
+
+1. ~~Slice #3 — Payment runway + intent flow~~ **Done**
+2. **Slice #4** — Statements
+3. **Slice #5** — Global search
+4. **Slice #6** — Reminder jobs
+
+Start slice #4 in a new workflow file (`PHASE-02.md` or per-slice).
+
+---
+
 ## Prior Phase 01 slices (context)
 
 1. ~~Scaffold Next.js app — App Router groups, features shells, auth stub.~~ **Done**
 2. ~~Lock data model — Prisma + SQLite.~~ **Done**
 3. ~~Vertical slice #1 — Sign in → onboarding → /cards → /overview.~~ **Done** (+ e2e)
 4. ~~Vertical slice #2 — Paydown priority + promo payoff.~~ **Done** (+ e2e / unit promo-math)
-5. **Vertical slice #3 — Payment runway + `/payments/new` intent flow.** ← next *after* gate
+5. ~~Vertical slice #3 — Payment runway + `/payments/new` intent flow.~~ **Done** (7-phase complete)
 6. Then statements, search, reminders/jobs — still MVP, after the core loop works.
 
 ### How to run (local)

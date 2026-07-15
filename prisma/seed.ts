@@ -11,6 +11,7 @@ async function main() {
   await db.notification.deleteMany();
   await db.payment.deleteMany();
   await db.paymentIntent.deleteMany();
+  await db.runwayItem.deleteMany();
   await db.statement.deleteMany();
   await db.promoPeriod.deleteMany();
   await db.creditCard.deleteMany();

@@ -67,7 +67,18 @@ export async function findIntentById(intentId: string, userId: string) {
   });
 }
 
+async function verifyIntentOwnership(intentId: string, userId: string) {
+  const intent = await db.paymentIntent.findFirst({
+    where: { id: intentId, userId },
+  });
+  if (!intent) {
+    throw new Error("Payment intent not found or access denied.");
+  }
+  return intent;
+}
+
 export async function updateIntentCard(params: UpdateIntentCardParams) {
+  await verifyIntentOwnership(params.intentId, params.userId);
   return db.paymentIntent.update({
     where: { id: params.intentId },
     data: { cardId: params.cardId },
@@ -76,6 +87,7 @@ export async function updateIntentCard(params: UpdateIntentCardParams) {
 }
 
 export async function updateIntentAmount(params: UpdateIntentAmountParams) {
+  await verifyIntentOwnership(params.intentId, params.userId);
   return db.paymentIntent.update({
     where: { id: params.intentId },
     data: {
@@ -88,6 +100,7 @@ export async function updateIntentAmount(params: UpdateIntentAmountParams) {
 }
 
 export async function updateIntentAccount(params: UpdateIntentAccountParams) {
+  await verifyIntentOwnership(params.intentId, params.userId);
   return db.paymentIntent.update({
     where: { id: params.intentId },
     data: { accountId: params.accountId },
@@ -96,6 +109,7 @@ export async function updateIntentAccount(params: UpdateIntentAccountParams) {
 }
 
 export async function confirmIntent(params: ConfirmIntentParams) {
+  await verifyIntentOwnership(params.intentId, params.userId);
   return db.paymentIntent.update({
     where: { id: params.intentId },
     data: {
