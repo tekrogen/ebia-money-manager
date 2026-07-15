@@ -1,7 +1,8 @@
 # PHASE-01 — Payment runway + payment intent flow
 
-**Status:** Discovery complete — **validation gate green locally** (CI/release/issue templates + integration tests in place). Exploration unblocked after stakeholder confirm + commit/branch.  
-**Date:** 2026-07-12  
+**Status:** Phase 4 locked (Option 2 feature architecture) — awaiting Implementation approval  
+**Date:** 2026-07-12 (Discovery) / 2026-07-13 (Exploration + defaults)  
+**Remote:** https://github.com/tekrogen/ebia-money-manager  
 **Feature workflow:** 7-phase (`/feature/workflow`)  
 **Slice:** Phase 01 vertical slice #3
 
@@ -104,14 +105,143 @@ Patterns mirrored from sibling `ebia` (CI/release/husky/commitlint/templates), a
 
 | Phase | Status | Notes |
 |-------|--------|-------|
-| 1. Discovery | Done (this file) | Confirm with stakeholder |
-| **Gate: harness + slices 1–2 tests + tooling** | **Green locally** | Ready for Exploration after confirm |
-| 2. Exploration | Pending | code-explorer: payments / paydown / cards patterns |
-| 3. Clarifying questions | Pending | Fill gaps before architecture |
-| 4. Architecture | Pending | code-architect options + recommendation |
+| 1. Discovery | Done | Confirmed |
+| Gate: harness + slices 1–2 + tooling | Green; on `main` @ origin | https://github.com/tekrogen/ebia-money-manager |
+| 2. Exploration | Done (2026-07-13) | See § Phase 2 below |
+| 3. Clarifying questions | Done (defaults 2026-07-13) | See § Phase 3 below |
+| 4. Architecture | **Locked: Option 2 (feature architecture)** | See § Phase 4 below |
 | 5. Implementation | Pending | After approach approval |
 | 6. Review | Pending | code-reviewer |
 | 7. Summary | Pending | Document shipped work + update CHANGELOG |
+
+---
+
+## Phase 2: Codebase Exploration Summary
+
+### Existing Patterns
+
+- **Feature public API via `index.ts`** — cross-feature imports only through `@/features/<domain>` (files: `src/features/{paydown,cards,authentication,overview,household}/index.ts`)
+- **Server action + Zod + `useActionState`** — gold standard: `create-card.ts` / `add-card-form.tsx` (`CreateCardState`, `fieldErrors`, `revalidatePath`, `redirect`)
+- **Thin dashboard pages** — `requireOnboardedUser()` → parallel fetch → pass props to feature components (`overview/page.tsx`)
+- **Service owns Prisma** — no separate repository layer yet (`paydown/server/service.ts`, `cards/server/service.ts`)
+- **Money** — `bigint` minor units + ISO currency; display via `formatMoney` / `formatPercent` (`lib/formatting/money.ts`)
+- **Dates** — calendar `YYYY-MM-DD` strings in domain; `paymentDueDay` is day-of-month int on cards
+
+### Architecture (payments gap)
+
+```
+src/app/(dashboard)/payments/**          ← stubs only (nav already wired)
+src/features/payments/                   ← DOES NOT EXIST — create whole feature
+prisma PaymentIntent / Payment           ← schema ready; unused by app code
+```
+
+### Conventions to follow
+
+- Household-scoped data (`householdId`), never user-owned cards alone
+- Attribution labels: Shared vs member displayName
+- Continue `revalidatePath` (no `revalidateTag` infrastructure yet)
+- BigInt → Client: format server-side or coerce carefully (runway is a Client shell)
+
+### Reusable components / helpers
+
+| Piece | Use for slice #3 |
+|-------|------------------|
+| `getCardsForHousehold` | Runway lanes + card picker |
+| `promo-math.ts` | Interest impact (export via paydown `index.ts`) |
+| `formatMoney` / utilization | Amounts, urgency |
+| `create-card` action/form | Mirror for payment intent steps |
+| `signInAsMarti` e2e helper | Slice #3 Playwright specs |
+
+### Key files
+
+1. `prisma/schema.prisma` — PaymentIntent / Payment ready
+2. `src/features/cards/server/queries.ts` — lane data
+3. `src/features/cards/actions/create-card.ts` — action pattern
+4. `src/features/paydown/utils/promo-math.ts` — runway interest math
+5. `src/app/(dashboard)/payments/{page,runway/page}.tsx` — stubs to replace
+6. `src/components/layout/dashboard-shell.tsx` — Payments / Runway nav
+
+### Gaps that need decisions (→ Phase 3)
+
+1. **RunwayItem persistence** — no model; drag needs somewhere to store `plannedPayDate`
+2. **PaymentIntent.accountId** — no Prisma relation to `FinancialAccount` (Payment has it; Intent does not)
+3. **Due dates** — seed has `paymentDueDay` only; runway needs calendar dates (derive utility)
+4. **FinancialAccount seed** — account step empty without at least one demo account
+5. **Strategy sort** — `avalanche | snowball | by_due_date | by_statement_close` specified, not implemented
+6. **promo-math / ownerLabel** — not on public APIs yet; extract before cross-feature use
+
+### Recommended tests for Implementation
+
+- Unit: `sort-runway-strategy`, `calculate-payment-options`, planned-date reschedule
+- Integration: create-payment-intent, reschedule-runway-item
+- E2E: `slice-03-runway.spec.ts`, `slice-03-payment-flow.spec.ts`
+
+---
+
+## Phase 3: Clarifying answers (defaults)
+
+| # | Decision | Default chosen |
+|---|----------|----------------|
+| 1 | Runway drag persistence | **New `RunwayItem` model** (`plannedPayDate`, amount, source, cardId, householdId) |
+| 2 | Account step | **Seed one demo `FinancialAccount`**; keep account step in the flow |
+| 3 | Intent stepper | **Full route-driven Option A** (`/payments/new` → amount → account → schedule → review → success) |
+| 4 | Due dates | **Derive next calendar date from `paymentDueDay`**; `by_statement_close` uses `statementCloseDay` when set, else falls back to due date |
+| 5 | Shared helpers | **Export `promo-math` from paydown `index.ts`**; **extract `ownerLabel` to household** |
+| 6 | `/payments` page | **Thin**: upcoming hero + links to runway / make payment; light history stub OK |
+| 7 | Runway client state | **Local React state / `useReducer`** — no Zustand |
+| 8 | Remote | **GitHub** [`tekrogen/ebia-money-manager`](https://github.com/tekrogen/ebia-money-manager) (already `origin`) |
+
+Also in scope for schema polish: add `PaymentIntent` → `FinancialAccount` Prisma relation (parity with `Payment`).
+
+---
+
+## Phase 4: Architecture options (awaiting choice)
+
+### Option 1: Minimal Changes
+**Approach:** Smallest delta — mirror create-card loops, service→Prisma like paydown, `?intentId=` query param through Option A steps, HTML5 drag, surgical promo-math/ownerLabel exports.  
+**Files:** ~36 (~29 new)  
+**Pros:** Fastest; max pattern reuse; independently verifiable steps  
+**Cons:** Less structure for intent mutation lifecycle; drag UX rough on touch  
+**Detail:** [minimal architect](f0f072de-ac5a-435b-b764-5f7c06311519)
+
+### Option 2: Clean Architecture
+**Approach:** Explicit layers (types → schemas → utils → queries/service → actions → components); thin **write** repository for PaymentIntent lifecycle; RunwayItemDTO with bigint→number at boundary; useReducer BEGIN/COMMIT/REVERT for drag.  
+**Files:** ~45  
+**Pros:** Best maintainability; strong client/server money typing; ownership guards centralized  
+**Cons:** Heavier than siblings; repository is a new pattern for this repo  
+**Detail:** [clean architect](82a7d769-a693-4ca0-a1e7-c9e2a303086b)
+
+### Option 3: Pragmatic Balance (recommended)
+**Approach:** Same locked defaults; service→Prisma (match existing features); DB-backed intent via URL `paymentIntentId`; HTML5 drag + useReducer; serialize BigInt once at query boundary; stub payment provider; 37 must-have files in ~4 commits; isolate nice-to-haves (payment-options util, runway-summary, history stub).  
+**Files:** ~37 must-have (+3 optional)  
+**Pros:** Speed + quality; CI-green commit chunks; no new runtime deps; matches Phase 01 MVP appetite  
+**Cons:** HTML5 drag touch limits (file follow-up issue); no write repository  
+**Detail:** [pragmatic architect](372c80da-a60e-4b64-8ea4-09294235a97b)
+
+### Recommendation
+
+**Option 3 — Pragmatic Balance**, because:
+- Honors all Phase 3 defaults without over-abstracting beyond current codebase patterns
+- Keeps intent refresh/back-button correct (DB + URL) without cookies/Zustand
+- Separates must-have vs nice-to-have so the slice can ship without blocking polish
+- Defers dnd-kit / write-repository as tracked follow-ups, not blockers
+
+### Decision (2026-07-15)
+
+**Option 2 — feature architecture with layered boundaries.** Not textbook Clean Architecture. Implements what `admin/internal/features/architecture/README.md` already specifies.
+
+Terminology:
+- **Actions** orchestrate user requests
+- **Services** contain business rules
+- **Repositories** own persistence and transactions (only for mutation-lifecycle domains)
+- **Queries** are read-only
+- **Providers** abstract external integrations (starting with `ManualPaymentProvider`)
+- **DTOs** define the server-to-client contract
+- **Components** remain presentation-focused
+
+Scope: payments only. Other features (cards, paydown) keep collapsed service→Prisma until they grow a mutation lifecycle. This is not a mandate to restructure the entire repo.
+
+**CHECKPOINT:** Implementation approval needed. Proceed?
 
 ---
 

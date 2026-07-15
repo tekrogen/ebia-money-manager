@@ -38,7 +38,9 @@ Canonical library: `/Volumes/SERV01-DTMAC/_Code_Library/GIT-Workflows/`
 
 | File | Focus | Status |
 |------|-------|--------|
-| [PHASE-01.md](./PHASE-01.md) | Slice #3 — payment runway + payment intent | Discovery done; validation gate **green locally** |
+| [PHASE-01.md](./PHASE-01.md) | Slice #3 — payment runway + payment intent | Phase 3 defaults locked; Architecture next |
+
+**Remote:** https://github.com/tekrogen/ebia-money-manager  
 
 ## Test commands
 

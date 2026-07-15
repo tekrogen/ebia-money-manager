@@ -1,4 +1,4 @@
-# Credit Card Manager
+# Ebia Money Manager
 
 Next.js App Router app for household credit-card operations.
 
