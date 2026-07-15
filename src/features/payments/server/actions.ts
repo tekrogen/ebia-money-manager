@@ -67,6 +67,11 @@ export async function selectCardAction(
     };
   }
 
+  const cards = await getPaymentCardOptions(user.householdId);
+  if (!cards.some((c) => c.id === parsed.data.cardId)) {
+    return { success: false, message: "Card not found in your household." };
+  }
+
   await updateIntentCard({
     intentId: parsed.data.intentId,
     userId: user.id,
@@ -199,7 +204,7 @@ export async function rescheduleRunwayItemAction(
   _previous: IntentActionState,
   formData: FormData,
 ): Promise<IntentActionState> {
-  await requireCurrentUser();
+  const user = await requireCurrentUser();
 
   const parsed = rescheduleRunwayItemSchema.safeParse({
     itemId: formData.get("itemId"),
@@ -214,7 +219,11 @@ export async function rescheduleRunwayItemAction(
     };
   }
 
-  await rescheduleRunwayItem(parsed.data.itemId, parsed.data.newPlannedPayDate);
+  await rescheduleRunwayItem(
+    parsed.data.itemId,
+    parsed.data.newPlannedPayDate,
+    user.householdId,
+  );
 
   revalidatePath("/payments/runway");
   return { success: true, message: "Rescheduled." };

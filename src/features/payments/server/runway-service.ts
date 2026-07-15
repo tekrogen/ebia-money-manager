@@ -51,7 +51,15 @@ export async function getRunwayDashboard(
 export async function rescheduleRunwayItem(
   itemId: string,
   newPlannedPayDate: string,
+  householdId: string,
 ) {
+  const item = await db.runwayItem.findFirst({
+    where: { id: itemId, householdId },
+  });
+  if (!item) {
+    throw new Error("Runway item not found or access denied.");
+  }
+
   return db.runwayItem.update({
     where: { id: itemId },
     data: { plannedPayDate: newPlannedPayDate },

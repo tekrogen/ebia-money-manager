@@ -112,6 +112,7 @@ model Household {
   members   HouseholdMember[]
   memberships HouseholdMembership[]
   cards     CreditCard[]
+  runwayItems RunwayItem[]
 }
 
 model HouseholdMember {
@@ -256,6 +257,7 @@ model RunwayItem {
   source              RunwayItemSource @default(minimum)
   createdAt           DateTime        @default(now())
   updatedAt           DateTime        @updatedAt
+  household           Household       @relation(fields: [householdId], references: [id], onDelete: Cascade)
   card                CreditCard      @relation(fields: [cardId], references: [id], onDelete: Cascade)
 
   @@index([householdId])

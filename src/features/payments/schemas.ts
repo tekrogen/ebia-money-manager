@@ -5,15 +5,20 @@ export const selectCardSchema = z.object({
   cardId: z.string().min(1),
 });
 
-export const selectAmountSchema = z.object({
-  intentId: z.string().min(1),
-  amountType: z.enum(["minimum", "statement", "current", "custom"]),
-  customAmountMinor: z
-    .number()
-    .int()
-    .positive()
-    .optional(),
-});
+export const selectAmountSchema = z
+  .object({
+    intentId: z.string().min(1),
+    amountType: z.enum(["minimum", "statement", "current", "custom"]),
+    customAmountMinor: z.number().int().positive().optional(),
+  })
+  .refine(
+    (data) =>
+      data.amountType !== "custom" || (data.customAmountMinor != null && data.customAmountMinor > 0),
+    {
+      message: "Custom amount must be greater than $0.",
+      path: ["customAmountMinor"],
+    },
+  );
 
 export const selectAccountSchema = z.object({
   intentId: z.string().min(1),
