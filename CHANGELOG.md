@@ -3,6 +3,18 @@
 All notable work on Credit Card Manager is tracked here.
 Format follows [Keep a Changelog](https://keepachangelog.com/); versions use [Semantic Versioning](https://semver.org/).
 
+## [0.3.0](https://github.com/tekrogen/ebia-money-manager/compare/v0.2.0...v0.3.0) (2026-07-15)
+
+
+### Features
+
+* **payments:** payment runway + intent flow (Phase 01 slice [#3](https://github.com/tekrogen/ebia-money-manager/issues/3)) ([331c72e](https://github.com/tekrogen/ebia-money-manager/commit/331c72ede959041bf4ac97ad8304a4b0a3ab4647))
+
+
+### Bug Fixes
+
+* **ci:** add DATABASE_URL env for Prisma in GitHub Actions ([8685d38](https://github.com/tekrogen/ebia-money-manager/commit/8685d3835e923a5cfdc2173f43e8f2334627e3aa))
+
 ## [0.2.0] — 2026-07-15
 
 ### Phase 01 Slice #3 — Payment Runway + Payment Intent Flow
