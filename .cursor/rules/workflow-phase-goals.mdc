@@ -1,0 +1,14 @@
+---
+description: Require explicit goal lists in feature workflow phase documentation
+globs: admin/internal/workflows/**/*.md
+alwaysApply: false
+---
+
+# Workflow Phase Goals
+
+- Every phase documented under `admin/internal/workflows/` must include an explicit `### Goals` checklist.
+- Write the goal list before performing that phase's work.
+- Goals must describe the phase's intended outcomes and decision gates, not implementation tasks from a later phase.
+- Mark goals complete only when the phase evidence is recorded in the same workflow document.
+- Do not advance to the next phase while required goals remain incomplete unless the workflow records the exception and user approval.
+- Use `admin/internal/workflows/README.md` as the canonical process reference.
