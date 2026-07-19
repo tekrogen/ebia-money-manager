@@ -31,6 +31,46 @@ describe("createManualStatementSchema", () => {
 
     expect(parsed.success).toBe(false);
   });
+
+  it("rejects javascript: and data: document URLs", () => {
+    for (const documentUrl of [
+      "javascript:alert(1)",
+      "data:text/html,<script>alert(1)</script>",
+    ]) {
+      const parsed = createManualStatementSchema.safeParse({
+        cardId: "card_123",
+        periodStart: "2026-06-01",
+        periodEnd: "2026-06-30",
+        closingBalance: 100,
+        minimumPayment: 10,
+        documentUrl,
+      });
+      expect(parsed.success).toBe(false);
+    }
+  });
+
+  it("accepts https document URLs", () => {
+    const parsed = createManualStatementSchema.safeParse({
+      cardId: "card_123",
+      periodStart: "2026-06-01",
+      periodEnd: "2026-06-30",
+      closingBalance: 100,
+      minimumPayment: 10,
+      documentUrl: "https://example.com/statement.pdf",
+    });
+    expect(parsed.success).toBe(true);
+  });
+
+  it("rejects money amounts above the safe maximum", () => {
+    const parsed = createManualStatementSchema.safeParse({
+      cardId: "card_123",
+      periodStart: "2026-06-01",
+      periodEnd: "2026-06-30",
+      closingBalance: 10_000_001,
+      minimumPayment: 10,
+    });
+    expect(parsed.success).toBe(false);
+  });
 });
 
 describe("date helpers", () => {

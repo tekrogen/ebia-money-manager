@@ -57,7 +57,7 @@ Canonical library: `/Volumes/SERV01-DTMAC/_Code_Library/GIT-Workflows/`
 | File | Focus | Status |
 |------|-------|--------|
 | [PHASE-01.md](./PHASE-01.md) | Slice #3 — payment runway + payment intent | 7-phase complete (merged) |
-| [PHASE-01-SLICE4.md](./PHASE-01-SLICE4.md) | Slice #4 — statements | Phase 5 Implementation done; Phase 6 Review next |
+| [PHASE-01-SLICE4.md](./PHASE-01-SLICE4.md) | Slice #4 — statements | Phase 6 Review done; Phase 7 Summary next |
 
 **Remote:** https://github.com/tekrogen/ebia-money-manager  
 

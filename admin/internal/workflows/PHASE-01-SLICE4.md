@@ -1,7 +1,7 @@
 # PHASE-01 Slice #4 — Statements
 
-**Status:** Phase 5 Implementation complete — awaiting Phase 6 Review  
-**Date:** 2026-07-15 (Discovery) / 2026-07-19 (Architecture + Implementation)  
+**Status:** Phase 6 Review complete — awaiting Phase 7 Summary  
+**Date:** 2026-07-15 (Discovery) / 2026-07-19 (Architecture + Implementation + Review)  
 **Remote:** https://github.com/tekrogen/ebia-money-manager  
 **Feature workflow:** 7-phase (`/feature/workflow`)  
 **Slice:** Phase 01 vertical slice #4
@@ -396,6 +396,43 @@ app/cards/[cardId] routes
 
 ---
 
+## Phase 6: Quality Review (2026-07-19)
+
+### Goals
+
+- [x] Review statements feature for bugs, ownership gaps, and convention violations.
+- [x] Verify schema integrity and write-once create path against Phase 4 blueprint.
+- [x] Identify missing tests and deferred follow-ups.
+- [x] File GitHub issues for non-blocking findings; fix only Critical blockers if found.
+- [x] Record review outcomes in this document before Phase 7.
+
+### Completion evidence
+
+Reviewed via code-reviewer. **No Critical blockers.** Phase 6 closes with issue filing. Recommended quick patch for #28 (XSS) and #29 (BigInt max) before real multi-user use.
+
+### What looks solid
+
+- Household ownership at layout + pages via `getCardById`
+- `"use server"` only exports async actions; action-state separate
+- Money as minor units; Zod + `useActionState`; UTC date formatting
+- Integration ownership rejection test; feature imports via public API
+
+### Findings filed
+
+| Severity | Issue | Title |
+|----------|-------|-------|
+| Important | [#28](https://github.com/tekrogen/ebia-money-manager/issues/28) | Restrict `documentUrl` to http/https (stored XSS) — **patched** |
+| Important | [#29](https://github.com/tekrogen/ebia-money-manager/issues/29) | Max bound on money inputs (BigInt RangeError) — **patched** |
+| Important | [#30](https://github.com/tekrogen/ebia-money-manager/issues/30) | Household guard on `getStatementsForCard` |
+| Important | [#31](https://github.com/tekrogen/ebia-money-manager/issues/31) | E2E cross-household URL traversal |
+| Important | [#32](https://github.com/tekrogen/ebia-money-manager/issues/32) | Unique Statement period per card |
+| Minor | [#33](https://github.com/tekrogen/ebia-money-manager/issues/33) | Form message color ignores success |
+| Minor | [#34](https://github.com/tekrogen/ebia-money-manager/issues/34) | Table headers missing `scope="col"` |
+
+Note: list+create E2E already exists in `tests/e2e/statements.spec.ts`; #31 covers the missing ownership-traversal case only.
+
+---
+
 ## Remaining 7-phase checkpoints (slice #4)
 
 | Phase | Status | Notes |
@@ -404,6 +441,6 @@ app/cards/[cardId] routes
 | 2. Exploration | Done (2026-07-15) | code-explorer — patterns mapped |
 | 3. Clarifying questions | Done (2026-07-15) | 8 defaults locked above |
 | 4. Architecture | **Locked: Option 3 (Pragmatic Balance)** (2026-07-19) | See § Phase 4 above |
-| 5. Implementation | **Done (2026-07-19)** | See § Phase 5 above |
-| 6. Review | Pending | code-reviewer |
+| 5. Implementation | **Done (2026-07-19)** | Merged via PR #26 |
+| 6. Review | **Done (2026-07-19)** | 7 issues filed (#28–#34); no Critical |
 | 7. Summary | Pending | Document + CHANGELOG |
