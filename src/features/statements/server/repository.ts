@@ -39,9 +39,29 @@ export async function createStatement(params: CreateStatementParams) {
   });
 }
 
-export async function findStatementsByCardId(cardId: string) {
+export async function findStatementsByCardId(
+  cardId: string,
+  householdId: string,
+) {
   return db.statement.findMany({
-    where: { cardId },
+    where: {
+      cardId,
+      card: { householdId },
+    },
     orderBy: { periodEnd: "desc" },
+  });
+}
+
+export async function findStatementByPeriod(params: {
+  cardId: string;
+  periodStart: string;
+  periodEnd: string;
+}) {
+  return db.statement.findFirst({
+    where: {
+      cardId: params.cardId,
+      periodStart: params.periodStart,
+      periodEnd: params.periodEnd,
+    },
   });
 }

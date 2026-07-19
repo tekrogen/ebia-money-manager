@@ -29,7 +29,8 @@ function toStatementDTO(row: {
 
 export async function getStatementsForCard(
   cardId: string,
+  householdId: string,
 ): Promise<StatementDTO[]> {
-  const rows = await findStatementsByCardId(cardId);
+  const rows = await findStatementsByCardId(cardId, householdId);
   return rows.map(toStatementDTO);
 }

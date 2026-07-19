@@ -112,4 +112,22 @@ describe("Statements create + ownership (integration)", () => {
       }),
     ).rejects.toThrow(/household/i);
   });
+
+  it("rejects duplicate billing periods on the same card", async () => {
+    await expect(
+      createManualStatement({
+        userId,
+        householdId,
+        data: {
+          cardId,
+          periodStart: "2026-06-01",
+          periodEnd: "2026-06-30",
+          closingBalance: 999,
+          minimumPayment: 10,
+          currency: "USD",
+          documentUrl: "",
+        },
+      }),
+    ).rejects.toThrow(/already exists/i);
+  });
 });

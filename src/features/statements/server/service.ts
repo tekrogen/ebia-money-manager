@@ -1,5 +1,9 @@
 import type { CreateManualStatementInput } from "../schemas";
-import { createStatement, verifyCardInHousehold } from "./repository";
+import {
+  createStatement,
+  findStatementByPeriod,
+  verifyCardInHousehold,
+} from "./repository";
 
 function dollarsToMinor(amount: number): bigint {
   return BigInt(Math.round(amount * 100));
@@ -16,6 +20,17 @@ export async function createManualStatement(params: {
   );
   if (!card) {
     throw new Error("Card not found in your household.");
+  }
+
+  const duplicate = await findStatementByPeriod({
+    cardId: params.data.cardId,
+    periodStart: params.data.periodStart,
+    periodEnd: params.data.periodEnd,
+  });
+  if (duplicate) {
+    throw new Error(
+      "A statement for this billing period already exists on this card.",
+    );
   }
 
   const paymentDueDate =

@@ -215,6 +215,7 @@ model Statement {
 
   @@index([cardId])
   @@index([userId])
+  @@unique([cardId, periodStart, periodEnd])
 }
 
 model FinancialAccount {
