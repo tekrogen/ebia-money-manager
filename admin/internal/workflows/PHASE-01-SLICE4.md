@@ -1,7 +1,7 @@
 # PHASE-01 Slice #4 — Statements
 
-**Status:** Phase 6 Review complete — awaiting Phase 7 Summary  
-**Date:** 2026-07-15 (Discovery) / 2026-07-19 (Architecture + Implementation + Review)  
+**Status:** Slice #4 complete (Phases 1–7)  
+**Date:** 2026-07-15 (Discovery) / 2026-07-19 (Architecture → Summary)  
 **Remote:** https://github.com/tekrogen/ebia-money-manager  
 **Feature workflow:** 7-phase (`/feature/workflow`)  
 **Slice:** Phase 01 vertical slice #4
@@ -433,6 +433,52 @@ Note: list+create E2E already exists in `tests/e2e/statements.spec.ts`; #31 cove
 
 ---
 
+## Phase 7: Summary (2026-07-19)
+
+### Goals
+
+- [x] Summarize what shipped in Slice #4 across all 7 phases.
+- [x] Record PRs, closed issues, and remaining follow-ups.
+- [x] Update workflow status and CHANGELOG notes for hand-off.
+- [x] Identify the next Phase 01 slice.
+
+### Slice #4 — complete
+
+**Manual statements under card detail** shipped through Discovery → Summary.
+
+#### What shipped
+
+| Area | Outcome |
+|------|---------|
+| Schema | `Statement → User` relation (#10); 2 seeded statements per demo card |
+| Cards | Cached `getCardById`; `/cards/[cardId]` shell with Statements + Details tabs |
+| Feature | `src/features/statements/` — list, write-once create, document link, layered server stack |
+| Hardening | http(s)-only `documentUrl` (#28); money input max (#29) |
+| Tests | Unit + integration + E2E create flow (40→43 Vitest cases) |
+| Process | Phase goal lists required in workflows; Option 3 Pragmatic Balance locked |
+
+#### PRs
+
+| PR | Role |
+|----|------|
+| [#25](https://github.com/tekrogen/ebia-money-manager/pull/25) | Cards `"use server"` action-state fix (#24) |
+| [#26](https://github.com/tekrogen/ebia-money-manager/pull/26) | Statements feature (slice #4, #10) |
+| [#35](https://github.com/tekrogen/ebia-money-manager/pull/35) | documentUrl + money bounds (#28, #29) |
+
+#### Follow-ups still open
+
+#30 (query household guard), #31 (cross-household E2E), #32 (unique period), #33 (form message color), #34 (`scope="col"`).
+
+#### What's next (remaining Phase 01)
+
+1. ~~Slice #4 — Statements~~ **Done**
+2. **Slice #5** — Global search
+3. **Slice #6** — Reminder jobs
+
+Optional: merge release-please [#27](https://github.com/tekrogen/ebia-money-manager/pull/27) (`v0.4.0`) when ready.
+
+---
+
 ## Remaining 7-phase checkpoints (slice #4)
 
 | Phase | Status | Notes |
@@ -442,5 +488,5 @@ Note: list+create E2E already exists in `tests/e2e/statements.spec.ts`; #31 cove
 | 3. Clarifying questions | Done (2026-07-15) | 8 defaults locked above |
 | 4. Architecture | **Locked: Option 3 (Pragmatic Balance)** (2026-07-19) | See § Phase 4 above |
 | 5. Implementation | **Done (2026-07-19)** | Merged via PR #26 |
-| 6. Review | **Done (2026-07-19)** | 7 issues filed (#28–#34); no Critical |
-| 7. Summary | Pending | Document + CHANGELOG |
+| 6. Review | **Done (2026-07-19)** | Issues #28–#34; #28/#29 patched via #35 |
+| 7. Summary | **Done (2026-07-19)** | This section |

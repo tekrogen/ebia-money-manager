@@ -13,6 +13,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versions use [Se
 ### Bug Fixes
 
 * **schema:** add `Statement → User` relation (closes #10)
+* **statements:** restrict `documentUrl` to http/https; cap money inputs (closes #28, #29)
 
 ## [0.3.1](https://github.com/tekrogen/ebia-money-manager/compare/v0.3.0...v0.3.1) (2026-07-15)
 
