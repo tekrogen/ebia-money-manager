@@ -2,10 +2,8 @@
 
 import { useActionState } from "react";
 
-import {
-  createManualCardAction,
-  initialCreateCardState,
-} from "@/features/cards/actions/create-card";
+import { initialCreateCardState } from "@/features/cards/actions/action-state";
+import { createManualCardAction } from "@/features/cards/actions/create-card";
 
 type MemberOption = {
   id: string;

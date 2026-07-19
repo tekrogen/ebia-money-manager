@@ -7,16 +7,7 @@ import { requireCurrentUser } from "@/features/authentication/server/queries";
 import { createManualCardSchema } from "@/features/cards/schemas/create-card-schema";
 import { createManualCard } from "@/features/cards/server/service";
 
-export type CreateCardState = {
-  success: boolean;
-  message: string;
-  fieldErrors?: Record<string, string[]>;
-};
-
-export const initialCreateCardState: CreateCardState = {
-  success: false,
-  message: "",
-};
+import type { CreateCardState } from "./action-state";
 
 export async function createManualCardAction(
   _previous: CreateCardState,
