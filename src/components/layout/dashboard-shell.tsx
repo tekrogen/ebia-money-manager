@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { GlobalSearch } from "@/components/layout/global-search";
 import { signOut } from "@/features/authentication/actions/sign-in";
 import type { AuthenticatedUser } from "@/features/authentication/server/queries";
 
@@ -38,6 +39,7 @@ export function DashboardShell({
             </nav>
           </div>
           <div className="flex items-center gap-3 text-sm">
+            <GlobalSearch />
             <span className="hidden text-[var(--tk-fg-3)] sm:inline">
               {user.name}
             </span>
