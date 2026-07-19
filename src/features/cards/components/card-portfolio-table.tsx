@@ -44,7 +44,12 @@ export function CardPortfolioTable({ cards }: { cards: CardListItem[] }) {
               >
                 <td className="px-3 py-3">
                   <div className="font-medium">
-                    {card.name}{" "}
+                    <Link
+                      href={`/cards/${card.id}`}
+                      className="hover:text-[var(--tk-com)] hover:underline"
+                    >
+                      {card.name}
+                    </Link>{" "}
                     <span className="text-[var(--tk-fg-3)]">
                       ({card.ownerLabel})
                     </span>

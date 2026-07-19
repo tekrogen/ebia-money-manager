@@ -683,7 +683,9 @@ type CardPageProps = {
 
 export default async function CardPage({ params }: CardPageProps) {
   const { cardId } = await params;
-  redirect(`/cards/${cardId}/activity`);
+  // Slice #4 MVP: statements is the primary nested surface.
+  // Activity redirect resumes when /cards/[cardId]/activity ships.
+  redirect(`/cards/${cardId}/statements`);
 }
 ```
 

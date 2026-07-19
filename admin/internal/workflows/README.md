@@ -20,6 +20,24 @@ Create a new `PHASE-##.md` when starting Discovery for that phase. Do not use da
    - Create GitHub **issues** for any test failures, flakes, gaps, or deferred follow-ups.
    - Use branching, commit, and release conventions from the shared GIT-Workflows library (below).
 
+## Required goal lists
+
+Every phase section in a workflow document must begin with an explicit `### Goals` checklist written before that phase starts.
+
+- Goals describe the phase's intended outcomes and decision gates.
+- Completion evidence is recorded in the same phase section.
+- A phase is not complete while required goals remain unchecked, unless the document records an approved exception.
+- Goals must remain within the current phase. For example, Architecture selects and documents an implementation approach; it does not implement it.
+
+```markdown
+## Phase N: Name
+
+### Goals
+
+- [ ] Outcome or decision required from this phase
+- [ ] Evidence that must be recorded before the phase closes
+```
+
 ## Shared GIT-Workflows references
 
 Canonical library: `/Volumes/SERV01-DTMAC/_Code_Library/GIT-Workflows/`
@@ -38,7 +56,8 @@ Canonical library: `/Volumes/SERV01-DTMAC/_Code_Library/GIT-Workflows/`
 
 | File | Focus | Status |
 |------|-------|--------|
-| [PHASE-01.md](./PHASE-01.md) | Slice #3 — payment runway + payment intent | Phase 3 defaults locked; Architecture next |
+| [PHASE-01.md](./PHASE-01.md) | Slice #3 — payment runway + payment intent | 7-phase complete (merged) |
+| [PHASE-01-SLICE4.md](./PHASE-01-SLICE4.md) | Slice #4 — statements | Phase 5 Implementation done; Phase 6 Review next |
 
 **Remote:** https://github.com/tekrogen/ebia-money-manager  
 

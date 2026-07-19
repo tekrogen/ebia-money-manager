@@ -83,7 +83,7 @@ async function main() {
     },
   });
 
-  await db.creditCard.create({
+  const bestBuy = await db.creditCard.create({
     data: {
       householdId: household.id,
       ownerMemberId: marti.id,
@@ -114,7 +114,7 @@ async function main() {
     },
   });
 
-  await db.creditCard.create({
+  const usBankBob = await db.creditCard.create({
     data: {
       householdId: household.id,
       ownerMemberId: bob.id,
@@ -145,7 +145,7 @@ async function main() {
     },
   });
 
-  await db.creditCard.create({
+  const usBankMarti = await db.creditCard.create({
     data: {
       householdId: household.id,
       ownerMemberId: marti.id,
@@ -166,6 +166,103 @@ async function main() {
     },
   });
 
+  const statementSeeds = [
+    {
+      card: amazon,
+      periods: [
+        {
+          periodStart: "2026-05-05",
+          periodEnd: "2026-06-04",
+          closingBalanceMinor: dollars(7920.15),
+          minimumPaymentMinor: dollars(158),
+          paymentDueDate: "2026-06-04",
+        },
+        {
+          periodStart: "2026-06-05",
+          periodEnd: "2026-07-04",
+          closingBalanceMinor: dollars(8097.69),
+          minimumPaymentMinor: dollars(162),
+          paymentDueDate: "2026-07-04",
+        },
+      ],
+    },
+    {
+      card: bestBuy,
+      periods: [
+        {
+          periodStart: "2026-05-20",
+          periodEnd: "2026-06-19",
+          closingBalanceMinor: dollars(3201.4),
+          minimumPaymentMinor: dollars(0),
+          paymentDueDate: "2026-06-19",
+        },
+        {
+          periodStart: "2026-06-20",
+          periodEnd: "2026-07-19",
+          closingBalanceMinor: dollars(3166.28),
+          minimumPaymentMinor: dollars(0),
+          paymentDueDate: "2026-07-19",
+        },
+      ],
+    },
+    {
+      card: usBankBob,
+      periods: [
+        {
+          periodStart: "2026-05-15",
+          periodEnd: "2026-06-14",
+          closingBalanceMinor: dollars(6480),
+          minimumPaymentMinor: dollars(130),
+          paymentDueDate: "2026-06-14",
+        },
+        {
+          periodStart: "2026-06-15",
+          periodEnd: "2026-07-14",
+          closingBalanceMinor: dollars(6513),
+          minimumPaymentMinor: dollars(130),
+          paymentDueDate: "2026-07-14",
+        },
+      ],
+    },
+    {
+      card: usBankMarti,
+      periods: [
+        {
+          periodStart: "2026-05-23",
+          periodEnd: "2026-06-22",
+          closingBalanceMinor: dollars(5990.12),
+          minimumPaymentMinor: dollars(120),
+          paymentDueDate: "2026-06-22",
+        },
+        {
+          periodStart: "2026-06-23",
+          periodEnd: "2026-07-22",
+          closingBalanceMinor: dollars(6078.88),
+          minimumPaymentMinor: dollars(121),
+          paymentDueDate: "2026-07-22",
+        },
+      ],
+    },
+  ];
+
+  for (const seed of statementSeeds) {
+    for (const period of seed.periods) {
+      await db.statement.create({
+        data: {
+          userId: user.id,
+          cardId: seed.card.id,
+          currency: seed.card.currency,
+          periodStart: period.periodStart,
+          periodEnd: period.periodEnd,
+          closingBalanceMinor: period.closingBalanceMinor,
+          minimumPaymentMinor: period.minimumPaymentMinor,
+          paymentDueDate: period.paymentDueDate,
+          source: "manual",
+        },
+      });
+    }
+  }
+
   const checkingAccount = await db.financialAccount.create({
     data: {
       userId: user.id,
@@ -177,6 +274,7 @@ async function main() {
   console.log("Seeded demo user", user.email);
   console.log("Household", household.id);
   console.log("Shared card", amazon.id);
+  console.log("Statements", statementSeeds.length * 2);
   console.log("Checking account", checkingAccount.id);
 }
 

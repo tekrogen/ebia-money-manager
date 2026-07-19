@@ -1,5 +1,8 @@
+import { cache } from "react";
+
 import { db } from "@/lib/db/client";
 import { calculateUtilization } from "@/lib/formatting/money";
+import { getOwnerLabel } from "@/features/household";
 
 export type CardListItem = {
   id: string;
@@ -19,6 +22,17 @@ export type CardListItem = {
   attribution: "member" | "shared";
   ownerLabel: string;
   promoLabel: string | null;
+};
+
+export type CardDetailItem = {
+  id: string;
+  name: string;
+  network: string;
+  lastFour: string;
+  currency: string;
+  attribution: "member" | "shared";
+  ownerLabel: string;
+  status: string;
 };
 
 export async function getCardsForHousehold(
@@ -62,10 +76,10 @@ export async function getCardsForHousehold(
       minimumPaymentMinor: card.minimumPaymentMinor,
       status: card.status,
       attribution: card.attribution,
-      ownerLabel:
-        card.attribution === "shared"
-          ? "Shared"
-          : (card.ownerMember?.displayName ?? "Unassigned"),
+      ownerLabel: getOwnerLabel(
+        card.attribution,
+        card.ownerMember?.displayName,
+      ),
       promoLabel: promo
         ? `0% promo · ends ${promo.endsOn}`
         : null,
@@ -76,3 +90,34 @@ export async function getCardsForHousehold(
 export async function getCardSummaries(householdId: string) {
   return getCardsForHousehold(householdId);
 }
+
+export const getCardById = cache(
+  async (
+    cardId: string,
+    householdId: string,
+  ): Promise<CardDetailItem | null> => {
+    const card = await db.creditCard.findFirst({
+      where: { id: cardId, householdId },
+      include: { ownerMember: { select: { displayName: true } } },
+    });
+
+    if (!card) {
+      return null;
+    }
+
+    return {
+      id: card.id,
+      name: card.name,
+      network: card.network,
+      lastFour: card.lastFour,
+      currency: card.currency,
+      attribution: card.attribution,
+      ownerLabel: getOwnerLabel(
+        card.attribution,
+        card.ownerMember?.displayName,
+      ),
+      status: card.status,
+    };
+  },
+);
+

@@ -3,6 +3,17 @@
 All notable work on Credit Card Manager is tracked here.
 Format follows [Keep a Changelog](https://keepachangelog.com/); versions use [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Features
+
+* **statements:** manual statement list + create under card detail (Phase 01 slice #4)
+* **cards:** `getCardById` public API + card detail layout (Statements / Details tabs)
+
+### Bug Fixes
+
+* **schema:** add `Statement → User` relation (closes #10)
+
 ## [0.3.1](https://github.com/tekrogen/ebia-money-manager/compare/v0.3.0...v0.3.1) (2026-07-15)
 
 
