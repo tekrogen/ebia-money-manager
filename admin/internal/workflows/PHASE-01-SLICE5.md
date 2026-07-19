@@ -1,6 +1,6 @@
 # PHASE-01 Slice #5 — Global Search
 
-**Status:** Phase 1 Discovery in progress  
+**Status:** Phases 1–3 complete; Phase 4 Architecture awaiting approval  
 **Date:** 2026-07-19  
 **Remote:** https://github.com/tekrogen/ebia-money-manager  
 **Issue:** [#38](https://github.com/tekrogen/ebia-money-manager/issues/38)  
@@ -122,16 +122,12 @@ Architecture §36 and §38 list transactions + merchants as MVP search targets, 
 
 ### Open questions (Phase 3)
 
-1. Confirm **cards-only MVP** vs pull Transaction schema into this slice?
-2. Include **statements** and/or **payments** as extra result groups?
-3. Keyboard UX: `⌘K` / `/` palettes vs header input only?
-4. Result limits per group (e.g. 5 each)?
-5. Empty / short-query / no-results copy?
+Resolved 2026-07-19 — see Phase 3.
 
 ### Success criteria (slice done when)
 
-- [ ] Global search mounted in dashboard header
-- [ ] Household-scoped card results (name, last four, issuer) with deep links
+- [ ] Global search mounted in dashboard header + ⌘K / Ctrl+K
+- [ ] Household-scoped **cards**, **statements**, and **payments** results with deep links
 - [ ] Debounced client shell + Zod-validated server search
 - [ ] Unit/integration + E2E coverage green
 - [ ] Phases 6–7 review/summary complete
@@ -142,12 +138,36 @@ Architecture §36 and §38 list transactions + merchants as MVP search targets, 
 
 ### Goals
 
-- [ ] Map dashboard shell mount points and auth/session helpers reusable by search
-- [ ] Trace how cards queries enforce household ownership (pattern to copy)
-- [ ] Inventory money/date formatting and public `index.ts` patterns for a new feature
-- [ ] Record exploration findings (gaps, reuse, risks) in this section
+- [x] Map dashboard shell mount points and auth/session helpers reusable by search
+- [x] Trace how cards queries enforce household ownership (pattern to copy)
+- [x] Inventory money/date formatting and public `index.ts` patterns for a new feature
+- [x] Record exploration findings (gaps, reuse, risks) in this section
 
-*(Not started.)*
+### Completion evidence
+
+Exploration recorded 2026-07-19 (codebase walk + explore agent). Findings below.
+
+### Findings
+
+| Area | Finding |
+|------|---------|
+| **Shell** | `DashboardShell` is an RSC; mount Client `GlobalSearch` island in header (between nav and user). No search stub today. |
+| **Auth** | `requireCurrentUser()` → `{ id, householdId, … }`. Actions must resolve scope server-side; never trust client `householdId`. |
+| **Cards** | `getCardsForHousehold(householdId)` / `getCardById(cardId, householdId)` via `@/features/cards`. Prefer search-owned Prisma `contains` queries over returning full card DTOs. |
+| **Statements** | Only `getStatementsForCard` today — **no household-wide search API**. Need new query joining `card: { householdId }`. |
+| **Payments** | Runway is household-scoped with good labels; `PaymentIntent` is user-scoped; durable `Payment` has **no list API** / little seed use. |
+| **Client patterns** | `useActionState` + forms everywhere; **no debounce, no ⌘K** precedent — new pattern required. |
+| **Money** | `@/lib/formatting/money` `formatMoney(bigint, currency)` — format at service fence so Client never sees BigInt. |
+| **Risks** | Weak statement ownership on list-by-card alone; payment deep links are page-level (`/payments/runway`); mobile header crowding. |
+
+### Reuse map
+
+| Need | Reuse |
+|------|--------|
+| Session | `requireCurrentUser()` |
+| Format amounts | `formatMoney` from `@/lib/formatting/money` |
+| Mount | `DashboardShell` + thin `components/layout/global-search.tsx` |
+| Feature shape | Mirror statements/payments: types → schemas → server → components → `index.ts` |
 
 ---
 
@@ -155,11 +175,30 @@ Architecture §36 and §38 list transactions + merchants as MVP search targets, 
 
 ### Goals
 
-- [ ] Resolve open questions from Discovery
-- [ ] Lock defaults (debounce, min length, result caps, groups in/out)
-- [ ] Document decisions in this section before Architecture
+- [x] Resolve open questions from Discovery
+- [x] Lock defaults (debounce, min length, result caps, groups in/out)
+- [x] Document decisions in this section before Architecture
 
-*(Not started.)*
+### Completion evidence
+
+User confirmed 2026-07-19: (1) defer Transaction/Merchant schema, (2) include statements + payments groups, (3) header + ⌘K.
+
+### Locked decisions
+
+| # | Decision | Locked default |
+|---|----------|----------------|
+| 1 | Transaction / Merchant | **Defer** — no new schema this slice |
+| 2 | Result groups | **Cards + Statements + Payments** |
+| 3 | Keyboard | **Header input + ⌘K / Ctrl+K** palette |
+| 4 | Min query length | **2** characters (after trim) |
+| 5 | Debounce | **250ms** |
+| 6 | Cap | **5** results per group |
+| 7 | Route | **No** dedicated `/search` page |
+| 8 | Payments meaning | **RunwayItem** (household) + **submitted/processing PaymentIntent** (user); exclude draft/expired; durable `Payment` rows out of MVP |
+| 9 | Scope | `householdId` for cards / statements / runway; `userId` for intents |
+| 10 | Institution field | Match `issuerKey` / `network` until Institution entity exists |
+| 11 | Money in results | Pre-format strings in service via `formatMoney` |
+| 12 | Empty / short query | `< 2` chars → no fetch / clear results; `≥ 2` + zero hits → “No results for '…'” |
 
 ---
 
@@ -167,11 +206,134 @@ Architecture §36 and §38 list transactions + merchants as MVP search targets, 
 
 ### Goals
 
-- [ ] Propose ≥2 approaches with trade-offs
-- [ ] Select one approach and document boundaries (feature public API, actions vs RSC)
-- [ ] No implementation in this phase
+- [x] Propose ≥2 approaches with trade-offs
+- [x] Select one approach and document boundaries (feature public API, actions vs RSC)
+- [ ] Obtain explicit user approval before Phase 5
+- [x] No implementation in this phase
 
-*(Not started.)*
+### Completion evidence
+
+Architecture options designed 2026-07-19. **Awaiting approval** of recommended Option A before implementation.
+
+### Option comparison
+
+| Dimension | A — Search-owned queries | B — Feature adapters | C — Inline in layout |
+|-----------|--------------------------|----------------------|----------------------|
+| Coupling | None (own Prisma reads) | Imports cards/statements/payments search helpers | Violates §36 feature folder |
+| Extensibility | Add group = add query fn | Each feature must publish adapter | Refactor later when Transactions land |
+| Testability | Clear service/integration surface | Split across features | Weak |
+| Fit | Matches “search owns queries” constraint | Allowed via public API but coordination-heavy | Rejected |
+
+### Recommendation
+
+**Option A — Search-owned queries** in `src/features/search/`.
+
+Why: matches architecture §36 + repo constraint that search owns household-filtered Prisma reads; keeps adapters out of other features; easy to add `transaction` / `merchant` kinds later.
+
+### Locked blueprint (Option A) — pending approval
+
+#### Feature tree
+
+```text
+src/features/search/
+├── types.ts
+├── schemas.ts                 # searchQuerySchema min 2 / max 200
+├── server/
+│   ├── queries.ts             # searchCards / searchStatements / searchPayments
+│   ├── service.ts             # Promise.all + formatMoney → SearchGroupsDTO
+│   └── actions.ts             # searchAction(query) — requireCurrentUser
+├── components/
+│   ├── search-palette.tsx
+│   ├── search-result-group.tsx
+│   └── search-result-item.tsx
+└── index.ts
+
+src/components/layout/
+├── global-search.tsx          # Client island: debounce, ⌘K, mounts palette
+└── dashboard-shell.tsx        # inject <GlobalSearch />
+```
+
+#### Data flow
+
+```text
+Header input or ⌘K/Ctrl+K
+  → GlobalSearch (Client): debounce 250ms, useTransition
+    → searchAction(query)
+      → requireCurrentUser() + Zod
+        → searchService.search({ userId, householdId, query })
+          → Promise.all([cards, statements, payments])
+            → SearchGroupsDTO (strings only; no BigInt on client)
+              → SearchPalette (listbox, arrows, Enter, Escape)
+```
+
+#### Result DTO
+
+```ts
+type SearchResultKind = "card" | "statement" | "payment";
+
+type SearchResultItem = {
+  id: string;
+  kind: SearchResultKind;
+  title: string;
+  subtitle: string;
+  meta: string | null;
+  href: string;
+};
+
+type SearchGroupsDTO = {
+  query: string;
+  groups: {
+    cards: SearchResultItem[];
+    statements: SearchResultItem[];
+    payments: SearchResultItem[];
+  };
+  totalCount: number;
+};
+```
+
+#### Deep links
+
+| Kind | href |
+|------|------|
+| Card | `/cards/[id]` |
+| Statement | `/cards/[cardId]/statements` |
+| Payment (runway / submitted intent) | `/payments/runway` |
+
+#### Ownership
+
+| Group | Scope |
+|-------|--------|
+| Cards | `householdId`, not archived |
+| Statements | `card.householdId` |
+| RunwayItem | `householdId` |
+| PaymentIntent | `userId` + status in `submitted` \| `processing` |
+
+#### Keyboard / a11y (MVP)
+
+- ⌘K / Ctrl+K opens; Escape closes and restores focus
+- Arrow keys + Enter navigate; `role="dialog"` + combobox/listbox + `aria-live` for count
+- Manual focus trap (no new dependency unless tests force it)
+
+#### File estimate
+
+~14 files (9 new source, 1 shell mod, 3 unit/integration, 1 E2E). Sequence: types/schema/action stub → queries/service → palette UI → shell mount → tests.
+
+#### Risks / deferred
+
+- Transactions / merchants still deferred
+- Statement period match is ISO substring (`2026-07`), not “July 2026”
+- Runway has no per-item route — all payment hits land on `/payments/runway`
+- SQLite `contains` ASCII case-folding only
+
+#### Test plan
+
+- Unit: schema trim/min/max; service DTO + money fence + href mapping
+- Integration: cross-household / cross-user isolation for all three groups
+- E2E: ⌘K → type seeded card name → Enter → `/cards/[id]`; Escape restores focus
+
+### Decision
+
+**Pending user approval of Option A.** Do not start Phase 5 until approved.
 
 ---
 
@@ -182,7 +344,7 @@ Architecture §36 and §38 list transactions + merchants as MVP search targets, 
 - [ ] Implement approved architecture on `feat/38-global-search`
 - [ ] Tests green; PR opens with `Closes #38`
 
-*(Not started.)*
+*(Blocked on Phase 4 approval.)*
 
 ---
 
