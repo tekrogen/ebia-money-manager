@@ -1,0 +1,207 @@
+# PHASE-01 Slice #5 — Global Search
+
+**Status:** Phase 1 Discovery in progress  
+**Date:** 2026-07-19  
+**Remote:** https://github.com/tekrogen/ebia-money-manager  
+**Issue:** [#38](https://github.com/tekrogen/ebia-money-manager/issues/38)  
+**Feature workflow:** 7-phase (`/feature/workflow`)  
+**Slice:** Phase 01 vertical slice #5  
+**Canonical architecture:** `admin/internal/features/architecture/README.md` §36  
+
+---
+
+## Phase 1: Discovery
+
+### Goals
+
+- [x] Confirm Slice #5 is next feature work after Slice #4 close-out + cleanup (#30–#34)
+- [x] Capture problem, architecture target, and current codebase reality
+- [x] List searchable entities that exist today vs architecture MVP scope
+- [x] Record assumptions, out-of-scope, and open questions for Phase 3
+- [x] File tracking issue (#38) and start workflow doc
+
+**Verdict:** Next feature work is **Phase 01 vertical slice #5 — Global Search**.
+
+### What's done
+
+| Slice | Status |
+|-------|--------|
+| #1 Auth + onboarding + cards + overview | Done |
+| #2 Paydown priority + promo payoff | Done |
+| #3 Payment runway + intent flow | Done (Phases 6–7 closed) |
+| #4 Statements | Done (Phases 1–7); cleanup PR #37 for #30–#34 |
+
+### What's next (slice #5)
+
+| Surface | Status | Goal |
+|---------|--------|------|
+| `src/features/search/` | Missing | Search domain: types, schemas, service, queries, components |
+| `components/layout/global-search.tsx` | Missing | Thin shell importing `@/features/search` |
+| Dashboard header mount | Missing | Search in `DashboardShell` top bar (architecture §2 / §36) |
+| Debounced client → server search | Missing | Grouped results with deep links, household/user scoped |
+
+### Problem / user
+
+Household members need a **fast way to find cards (and later transactions/merchants)** from anywhere in the dashboard — by name, last four, institution — without navigating through lists first.
+
+### Key requirements (from architecture §36)
+
+- Real MVP capability, not a shell placeholder
+- Scope (architecture text):
+  - **Transactions** — merchant name, memo, amount
+  - **Cards** — name, last four, institution
+  - **Merchants** — distinct / normalized merchant names
+- `features/search/` owns UI + server search service
+- Mount from dashboard shell; not a dedicated `/search` route (service reusable if route added later)
+- Always scope by `userId` (project practice: also household for card ownership)
+- Deep links; small result payloads; click-through loads full entities
+- Debounced client shell → search action/route → `searchService.search({ userId, query })`
+
+### Architecture file structure (target)
+
+```text
+features/search/
+├── components/
+│   ├── global-search.tsx
+│   ├── search-results.tsx
+│   └── search-result-group.tsx
+├── server/
+│   ├── queries.ts
+│   └── service.ts
+├── schemas/
+│   └── search-query-schema.ts
+└── types/
+    └── search-result.ts
+```
+
+```text
+GlobalSearch (Client shell)
+  → debounced query to search action/route
+    → searchService.search({ userId, query })
+      → cards + transactions + merchants queries
+        → grouped results with deep links
+```
+
+### Codebase reality (verified 2026-07-19)
+
+| Entity | In Prisma? | Searchable fields today | Deep link today |
+|--------|------------|-------------------------|-----------------|
+| **CreditCard** | Yes | `name`, `lastFour`, `issuerKey` / `institutionId` | `/cards/[cardId]` (statements/details) |
+| **Statement** | Yes | period dates, balances (not in §36 scope) | `/cards/[cardId]/statements` |
+| **Payment / PaymentIntent** | Yes | amounts, status (not in §36 scope) | `/payments/...` |
+| **Transaction** | **No** | — | `/transactions/[id]` does not exist |
+| **Merchant** | **No** | — | merchant-filtered txn URL does not exist |
+
+Dashboard shell (`src/components/layout/dashboard-shell.tsx`) has brand + nav + sign-out only — **no search control**. No `features/search/` and no `global-search.tsx` stub.
+
+### Gap vs architecture
+
+Architecture §36 and §38 list transactions + merchants as MVP search targets, but **Phase 01 has not shipped a Transaction (or Merchant) model or routes**. Building full §36 literally would require either:
+
+1. **Defer** txn/merchant result groups until those domains exist (search cards now; keep empty/stub groups or omit), or  
+2. **Expand this slice** to introduce Transaction (+ optional Merchant) schema + seed + minimal list/detail — much larger than “global search,” or  
+3. **Search adjacent existing records** (statements / payments) as interim substitutes — diverges from §36 naming.
+
+**Discovery recommendation:** Treat Slice #5 as **cards-first global search** with architecture-shaped feature folder and result-group UI that can grow; explicitly defer transaction/merchant queries to a later slice (or a follow-up issue). Confirm in Phase 3.
+
+### Assumptions
+
+1. Cleanup #30–#34 (PR #37) can merge in parallel; search does not depend on it.
+2. Search scopes to the **session user’s household** for cards (same pattern as cards/statements), even though §36 says `userId` only.
+3. No dedicated `/search` page in this slice.
+4. Minimum query length + debounce (e.g. 2+ chars, ~200–300ms) TBD in Defaults.
+5. Institution display can use `issuerKey` until a real Institution entity exists.
+
+### Out of scope (this slice)
+
+- Transaction list / drawer / intercepting routes
+- Merchant normalization / merchant entity
+- Full-text / SQLite FTS indexes (start with `contains` / prefix filters)
+- Notifications menu, sidebar refactor beyond mounting search
+- Slice #6 reminder jobs
+
+### Open questions (Phase 3)
+
+1. Confirm **cards-only MVP** vs pull Transaction schema into this slice?
+2. Include **statements** and/or **payments** as extra result groups?
+3. Keyboard UX: `⌘K` / `/` palettes vs header input only?
+4. Result limits per group (e.g. 5 each)?
+5. Empty / short-query / no-results copy?
+
+### Success criteria (slice done when)
+
+- [ ] Global search mounted in dashboard header
+- [ ] Household-scoped card results (name, last four, issuer) with deep links
+- [ ] Debounced client shell + Zod-validated server search
+- [ ] Unit/integration + E2E coverage green
+- [ ] Phases 6–7 review/summary complete
+
+---
+
+## Phase 2: Codebase Exploration
+
+### Goals
+
+- [ ] Map dashboard shell mount points and auth/session helpers reusable by search
+- [ ] Trace how cards queries enforce household ownership (pattern to copy)
+- [ ] Inventory money/date formatting and public `index.ts` patterns for a new feature
+- [ ] Record exploration findings (gaps, reuse, risks) in this section
+
+*(Not started.)*
+
+---
+
+## Phase 3: Clarifying Questions / Defaults
+
+### Goals
+
+- [ ] Resolve open questions from Discovery
+- [ ] Lock defaults (debounce, min length, result caps, groups in/out)
+- [ ] Document decisions in this section before Architecture
+
+*(Not started.)*
+
+---
+
+## Phase 4: Architecture Design
+
+### Goals
+
+- [ ] Propose ≥2 approaches with trade-offs
+- [ ] Select one approach and document boundaries (feature public API, actions vs RSC)
+- [ ] No implementation in this phase
+
+*(Not started.)*
+
+---
+
+## Phase 5: Implementation
+
+### Goals
+
+- [ ] Implement approved architecture on `feat/38-global-search`
+- [ ] Tests green; PR opens with `Closes #38`
+
+*(Not started.)*
+
+---
+
+## Phase 6: Quality Review
+
+### Goals
+
+- [ ] Code review against conventions and ownership rules
+- [ ] File follow-up issues for residual defects
+
+*(Not started.)*
+
+---
+
+## Phase 7: Summary
+
+### Goals
+
+- [ ] Document what shipped, test counts, and next slice
+- [ ] Update CHANGELOG / workflow index as needed
+
+*(Not started.)*
