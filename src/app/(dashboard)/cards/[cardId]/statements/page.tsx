@@ -18,7 +18,7 @@ export default async function CardStatementsPage({ params }: PageProps) {
     notFound();
   }
 
-  const statements = await getStatementsForCard(cardId);
+  const statements = await getStatementsForCard(cardId, user.householdId);
 
   return (
     <div className="space-y-4">

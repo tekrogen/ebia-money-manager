@@ -109,7 +109,14 @@ export function ManualStatementForm({
       </div>
 
       {state.message ? (
-        <p aria-live="polite" className="text-sm text-[var(--tk-danger)]">
+        <p
+          aria-live="polite"
+          className={`text-sm ${
+            state.success
+              ? "text-[var(--tk-fg-2)]"
+              : "text-[var(--tk-danger)]"
+          }`}
+        >
           {state.message}
         </p>
       ) : null}

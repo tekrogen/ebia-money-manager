@@ -15,11 +15,21 @@ export function StatementList({ statements }: { statements: StatementDTO[] }) {
       <table className="min-w-full text-left text-sm">
         <thead className="border-b border-[var(--tk-border)] bg-[var(--tk-bg-1)] text-[var(--tk-fg-3)]">
           <tr>
-            <th className="px-3 py-2 font-medium">Period</th>
-            <th className="px-3 py-2 font-medium">Closing balance</th>
-            <th className="px-3 py-2 font-medium">Minimum due</th>
-            <th className="px-3 py-2 font-medium">Due date</th>
-            <th className="px-3 py-2 font-medium">Document</th>
+            <th scope="col" className="px-3 py-2 font-medium">
+              Period
+            </th>
+            <th scope="col" className="px-3 py-2 font-medium">
+              Closing balance
+            </th>
+            <th scope="col" className="px-3 py-2 font-medium">
+              Minimum due
+            </th>
+            <th scope="col" className="px-3 py-2 font-medium">
+              Due date
+            </th>
+            <th scope="col" className="px-3 py-2 font-medium">
+              Document
+            </th>
           </tr>
         </thead>
         <tbody>
