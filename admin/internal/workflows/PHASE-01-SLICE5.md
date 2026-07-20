@@ -1,6 +1,6 @@
 # PHASE-01 Slice #5 — Global Search
 
-**Status:** Phases 1–3 complete; Phase 4 Architecture awaiting approval  
+**Status:** Phase 4 approved; Phase 5 Implementation in progress  
 **Date:** 2026-07-19  
 **Remote:** https://github.com/tekrogen/ebia-money-manager  
 **Issue:** [#38](https://github.com/tekrogen/ebia-money-manager/issues/38)  
@@ -208,12 +208,12 @@ User confirmed 2026-07-19: (1) defer Transaction/Merchant schema, (2) include st
 
 - [x] Propose ≥2 approaches with trade-offs
 - [x] Select one approach and document boundaries (feature public API, actions vs RSC)
-- [ ] Obtain explicit user approval before Phase 5
+- [x] Obtain explicit user approval before Phase 5
 - [x] No implementation in this phase
 
 ### Completion evidence
 
-Architecture options designed 2026-07-19. **Awaiting approval** of recommended Option A before implementation.
+Architecture options designed 2026-07-19. **Option A approved by user 2026-07-19.**
 
 ### Option comparison
 
@@ -230,7 +230,7 @@ Architecture options designed 2026-07-19. **Awaiting approval** of recommended O
 
 Why: matches architecture §36 + repo constraint that search owns household-filtered Prisma reads; keeps adapters out of other features; easy to add `transaction` / `merchant` kinds later.
 
-### Locked blueprint (Option A) — pending approval
+### Locked blueprint (Option A)
 
 #### Feature tree
 
@@ -333,7 +333,7 @@ type SearchGroupsDTO = {
 
 ### Decision
 
-**Pending user approval of Option A.** Do not start Phase 5 until approved.
+**Locked: Option A — Search-owned queries** (approved 2026-07-19).
 
 ---
 
@@ -341,10 +341,12 @@ type SearchGroupsDTO = {
 
 ### Goals
 
-- [ ] Implement approved architecture on `feat/38-global-search`
-- [ ] Tests green; PR opens with `Closes #38`
+- [x] Implement approved architecture on `feat/38-global-search`
+- [x] Tests green; PR opens with `Closes #38`
 
-*(Blocked on Phase 4 approval.)*
+### Completion evidence
+
+Implemented Option A: `src/features/search/`, header `GlobalSearch` + ⌘K/Ctrl+K, cards/statements/payments groups. Vitest 52; Playwright search E2E 2/2 green.
 
 ---
 
