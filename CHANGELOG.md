@@ -3,6 +3,27 @@
 All notable work on Credit Card Manager is tracked here.
 Format follows [Keep a Changelog](https://keepachangelog.com/); versions use [Semantic Versioning](https://semver.org/).
 
+## [0.4.0](https://github.com/tekrogen/ebia-money-manager/compare/v0.3.1...v0.4.0) (2026-07-20)
+
+
+### Features
+
+* **cards:** add getCardById and card detail shell ([50ff255](https://github.com/tekrogen/ebia-money-manager/commit/50ff25543bc899132c2e48d8e5546da3315aad62))
+* **schema:** add Statement→User relation and seed statements ([9b790b3](https://github.com/tekrogen/ebia-money-manager/commit/9b790b3c1f597f62b2b51eb1781205e254b83606)), closes [#10](https://github.com/tekrogen/ebia-money-manager/issues/10)
+* **search:** add global search for cards, statements, payments ([5b586b3](https://github.com/tekrogen/ebia-money-manager/commit/5b586b385de6d49472278a2f6d75660821e6a62c)), closes [#38](https://github.com/tekrogen/ebia-money-manager/issues/38)
+* **search:** global search (Phase 01 Slice [#5](https://github.com/tekrogen/ebia-money-manager/issues/5)) ([69a9276](https://github.com/tekrogen/ebia-money-manager/commit/69a9276467bc411397f4337094ed77c2243a1896))
+* **statements:** card statements list + create (Phase 01 slice [#4](https://github.com/tekrogen/ebia-money-manager/issues/4)) ([a128adc](https://github.com/tekrogen/ebia-money-manager/commit/a128adc509a7e1d927f58cc42a618505c24d81ee))
+* **statements:** manual statement list and create flow ([ecf8fbd](https://github.com/tekrogen/ebia-money-manager/commit/ecf8fbd86e44064075dbcf8f7c9c2b69959fb5d3))
+
+
+### Bug Fixes
+
+* **cards:** move initialCreateCardState out of use server module ([7e7761c](https://github.com/tekrogen/ebia-money-manager/commit/7e7761c519e4c10395cd538d1240741a4759b994)), closes [#24](https://github.com/tekrogen/ebia-money-manager/issues/24)
+* **statements:** close Phase 6 cleanup issues [#30](https://github.com/tekrogen/ebia-money-manager/issues/30)–[#34](https://github.com/tekrogen/ebia-money-manager/issues/34) ([46a5895](https://github.com/tekrogen/ebia-money-manager/commit/46a5895213eb6fabdec4792d7f775b3f7f9cedfb))
+* **statements:** close Phase 6 cleanup issues [#30](https://github.com/tekrogen/ebia-money-manager/issues/30)–[#34](https://github.com/tekrogen/ebia-money-manager/issues/34) ([3f8df92](https://github.com/tekrogen/ebia-money-manager/commit/3f8df928d3d9f993a692158c0482ebd917eda590))
+* **statements:** harden documentUrl and money input bounds ([4dddc09](https://github.com/tekrogen/ebia-money-manager/commit/4dddc09001545fe1e7806ee66389ff7508fb2a17))
+* **statements:** harden documentUrl and money input bounds ([199dcfe](https://github.com/tekrogen/ebia-money-manager/commit/199dcfe41661408302e577027ce36c2d9d9920c9))
+
 ## [Unreleased]
 
 ### Features
