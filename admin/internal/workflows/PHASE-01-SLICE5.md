@@ -1,9 +1,10 @@
 # PHASE-01 Slice #5 — Global Search
 
-**Status:** Phase 4 approved; Phase 5 Implementation in progress  
-**Date:** 2026-07-19  
+**Status:** Phases 1–7 complete (close-out)  
+**Date:** 2026-07-19 (Discovery → Implementation) / 2026-07-20 (Review + Summary)  
 **Remote:** https://github.com/tekrogen/ebia-money-manager  
-**Issue:** [#38](https://github.com/tekrogen/ebia-money-manager/issues/38)  
+**Issue:** [#38](https://github.com/tekrogen/ebia-money-manager/issues/38) (closed via PR #40)  
+**Shipped:** PR [#40](https://github.com/tekrogen/ebia-money-manager/pull/40) · Release [v0.4.0](https://github.com/tekrogen/ebia-money-manager/releases) via PR [#27](https://github.com/tekrogen/ebia-money-manager/pull/27)  
 **Feature workflow:** 7-phase (`/feature/workflow`)  
 **Slice:** Phase 01 vertical slice #5  
 **Canonical architecture:** `admin/internal/features/architecture/README.md` §36  
@@ -126,11 +127,11 @@ Resolved 2026-07-19 — see Phase 3.
 
 ### Success criteria (slice done when)
 
-- [ ] Global search mounted in dashboard header + ⌘K / Ctrl+K
-- [ ] Household-scoped **cards**, **statements**, and **payments** results with deep links
-- [ ] Debounced client shell + Zod-validated server search
-- [ ] Unit/integration + E2E coverage green
-- [ ] Phases 6–7 review/summary complete
+- [x] Global search mounted in dashboard header + ⌘K / Ctrl+K
+- [x] Household-scoped **cards**, **statements**, and **payments** results with deep links
+- [x] Debounced client shell + Zod-validated server search
+- [x] Unit/integration + E2E coverage green
+- [x] Phases 6–7 review/summary complete
 
 ---
 
@@ -354,10 +355,28 @@ Implemented Option A: `src/features/search/`, header `GlobalSearch` + ⌘K/Ctrl+
 
 ### Goals
 
-- [ ] Code review against conventions and ownership rules
-- [ ] File follow-up issues for residual defects
+- [x] Code review against conventions and ownership rules
+- [x] File follow-up issues for residual defects
 
-*(Not started.)*
+### Completion evidence
+
+Code review completed 2026-07-20 against shipped search on `main` (PR #40). Findings filed as GitHub issues below. No BigInt client leakage; household scoping correct for cards/statements/runway.
+
+### Findings
+
+| # | Severity | Issue | Tracking |
+|---|----------|-------|----------|
+| 1 | Critical | Stale debounced response can overwrite newer results | [#41](https://github.com/tekrogen/ebia-money-manager/issues/41) |
+| 2 | Critical | Server action + client component co-exported from undirected barrel | [#42](https://github.com/tekrogen/ebia-money-manager/issues/42) |
+| 3 | Important | Combobox missing accessible name; group headings not `aria-labelledby` | [#43](https://github.com/tekrogen/ebia-money-manager/issues/43) |
+| 4 | Important | Swallowed search errors / dead outer try/catch | [#44](https://github.com/tekrogen/ebia-money-manager/issues/44) |
+| 5 | Important | PaymentIntent results user-scoped inside household Payments group (design) | [#45](https://github.com/tekrogen/ebia-money-manager/issues/45) |
+| 6 | Minor | `contains` without `mode: 'insensitive'` (PG readiness) — note on #44 | (bundle) |
+| 7 | Minor | Integration `deleteMany` truncates shared test DB — noted, no issue | — |
+
+### Recommended fix order
+
+1. #41 race → 2. #43 a11y → 3. #44 logging → 4. #42 barrel → 5. #45 design decision
 
 ---
 
@@ -365,7 +384,36 @@ Implemented Option A: `src/features/search/`, header `GlobalSearch` + ⌘K/Ctrl+
 
 ### Goals
 
-- [ ] Document what shipped, test counts, and next slice
-- [ ] Update CHANGELOG / workflow index as needed
+- [x] Document what shipped, test counts, and next slice
+- [x] Update CHANGELOG / workflow index as needed
 
-*(Not started.)*
+### What shipped
+
+- `src/features/search/` — types, Zod schema, search-owned Prisma queries, service, `searchAction`, palette UI
+- Dashboard header `GlobalSearch` + ⌘K / Ctrl+K
+- Result groups: cards, statements, payments (runway + submitted/processing intents)
+- Tests: unit (schema + mapping), integration (ownership), E2E (⌘K + Escape)
+- Released in **v0.4.0** (PR #27) alongside statements slice work
+
+### Test coverage (at ship)
+
+- Vitest: 52+ (grew with statements unique-period tests after #37)
+- Playwright: search E2E 2/2 green at merge
+
+### Follow-ups before/during next work
+
+- Patch Phase 6 issues **#41–#44** (and decide **#45**) — prefer a small cleanup PR before or at the start of Slice #6
+- Optional CI chore: bump `googleapis/release-please-action@v4` → `@v5` (Node 24; silences deprecation warning) — **not** Slice #5 scope
+
+### What's next (remaining Phase 01)
+
+1. ~~Slice #5 — Global search~~ **Done** (Phases 1–7)
+2. **Slice #6 — Reminder jobs** (canonical per `PHASE-01.md` / architecture)
+3. Older backlog **#7–#20** (cards/overview/auth) — **not** assigned to Slice #6 in source docs; schedule as an explicit cleanup pass or expand Slice #6 Discovery to include them by decision
+
+---
+
+## Notes for agents
+
+- Architecture §36 still lists transactions/merchants; deferred until those domains exist.
+- Do not add AI `Co-Authored-By` trailers to commits in this repo.
